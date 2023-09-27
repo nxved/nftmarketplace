@@ -21,6 +21,8 @@ export default function Home() {
   const [nfts, setNfts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [globalLoading, setGlobalLoading] = useState(false);
+  const [loadingNftId, setLoadingNftId] = useState(null);
+
 
   const [loadingState, setLoadingState] = useState("not-loaded");
   useEffect(() => {
@@ -109,9 +111,9 @@ export default function Home() {
     // }
 
     setLoading(true);
-
+    setLoadingNftId(nft.tokenId);
     const price = ethers.utils.parseUnits(nft.price.toString(), "ether");
-
+try{
     const transaction = await NFTcontract.buy(nft.tokenId, {
       value: price,
     });
@@ -123,16 +125,33 @@ export default function Home() {
           console.log("Transaction successful:", tx);
           toast.success("Successfully Bought NFT");
           loadNFTs();
+          setLoadingNftId(null);
+
+          setLoading(false);
+
         } else {
           console.error("Transaction failed:", tx);
           toast.error("Transaction failed. Please try again.");
+          setLoading(false);
+          setLoadingNftId(null);
+
         }
       })
       .catch((err) => {
         console.log(err);
         toast.error("Error in Buying");
+        setLoading(false);
+        setLoadingNftId(null);
+
       });
+    } catch (error) {
+      toast.error("User Rejected Transaction");
+      setLoading(false);
+      setLoadingNftId(null);
+   }
     setLoading(false);
+    setLoadingNftId(null);
+
   }
 
   if (loadingState === "loaded" && !nfts.length)
@@ -176,8 +195,7 @@ export default function Home() {
                     className="w-full px-12 py-2 mt-4 font-bold text-white bg-gray-500 rounded"
                     onClick={() => buyNft(nft)}
                     disabled={loading}
-                  >
-                    {loading ? "Buying..." : "Buy"}
+                  > {loadingNftId === nft.tokenId ? "Buying" : "BUY"}
                   </button>
                 </div>
               </div>
