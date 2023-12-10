@@ -119,13 +119,6 @@ export default function Home() {
     setLoading(false);
     setLoadingNftId(null);
   }
-
-  if (loadingState === "loaded" && !nfts.length)
-    return (
-      <h1 className="w-full px-12 py-2 mt-4 font-bold text-white bg-gray-900 rounded">
-        No items in marketplace
-      </h1>
-    );
   return (
     <div className="dark:bg-gray-dark dark:text-white">
   <div className="flex items-start justify-between mb-4">
@@ -168,7 +161,11 @@ export default function Home() {
         Currently Listed NFT
         </h2>
         </div>
-
+{  (loadingState === "loaded" && !nfts.length) ?
+      <h1 className="w-full px-12 py-2 mt-4 font-bold text-white bg-gray-900 rounded">
+      No items in marketplace
+    </h1>
+:
       <div className="px-4" style={{ maxWidth: "1600px" }}>
         {globalLoading && <Loading />}
         <div className="grid grid-cols-1 gap-4 pt-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -204,6 +201,8 @@ export default function Home() {
           ))}
         </div>
       </div>
+}
+
       <div className="p-4 mt-4 mb-4 text-center bg-white rounded-lg shadow-md">
       <h2 className="mb-2 text-xl font-thin">
         `Become Part of Loyalty Program : Purchase NFT of amount ${thresholdRE} Eth and get Rewarded with NFT`

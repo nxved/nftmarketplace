@@ -13,11 +13,11 @@ const ChainConfig = {
                     symbol: "ETH",
                     decimals: 18,
                 },
-                rpcUrls: ["wss://ethereum-sepolia.publicnode.com"],
+                rpcUrls: ["https://rpc.sepolia.org/"],
                 blockExplorerURL: ["https://sepolia.etherscan.io"],
             },
             NFTMarketplace: {
-                address: ethers.utils.getAddress("0xfc4bB16fBCE3173F566Bab96E2b3769BBE6C27Be"),
+                address: ethers.utils.getAddress("0x9096843c7e8a636065063233c6dCf7D23518f81B"),
                 abi: NFTMarketplaceABI,
             },
         },
@@ -64,7 +64,7 @@ const ChainConfig = {
     },
 }
 
-export const config = ChainConfig.binance.testnet;
+export const config = ChainConfig.ethereum.testnet;
 export const blockExplorerURL = config.ChainConfig.blockExplorerURL;
 
 export const chainConfig = config.ChainConfig;

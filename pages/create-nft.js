@@ -28,18 +28,19 @@ export default function CreateItem() {
         method: "POST",
         body: JSON.stringify(fileToUpload),
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
       });
       const responseData = await res.json(); // Parse JSON response
-      const ipfsHash = responseData.data
+      const ipfsHash = responseData.data;
       setCid(ipfsHash);
       setUploading(false);
-      console.log(ipfsHash)
+      console.log(ipfsHash);
+      return ipfsHash;
     } catch (e) {
       console.log(e);
       setUploading(false);
-      toast.error("Error in minting try again")
+      toast.error("Error in minting try again");
     }
   };
 
@@ -53,8 +54,6 @@ export default function CreateItem() {
   const walletState = useWallet();
   const NFTcontract = useNFTMarketContract();
   const [loading, setLoading] = useState(false);
-
-
 
   async function mint() {
     const { nameNFT, description, imageLink } = formInput;
@@ -72,11 +71,17 @@ export default function CreateItem() {
         name: nameNFT,
       };
 
-     await uploadFile(metadata);
+      const ipfsHash = await uploadFile(metadata);
+      console.log(ipfsHash, "after pinata");
+      if (!ipfsHash) {
+        console.log("error from pinata");
+        toast.error("Error in minting try again");
+        return;
+      }
 
       const transaction = await NFTcontract.mint(
         nameNFT,
-        `https://gateway.pinata.cloud/ipfs/${cid}`
+        `https://gateway.pinata.cloud/ipfs/${ipfsHash}`
       );
       await transaction.wait().then(async (tx) => {
         console.log(tx);
@@ -87,7 +92,7 @@ export default function CreateItem() {
         } else {
           console.error("Transaction failed:", tx);
           toast.error("Transaction failed. Please try again.");
-        };
+        }
       });
     } catch (error) {
       console.error("Error creating NFT:", error);
