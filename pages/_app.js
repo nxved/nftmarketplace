@@ -1,37 +1,49 @@
-import "../styles/globals.css";
-import Link from "next/link";
-import WalletProvider from "../context/WalletContext";
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+// Importing required modules and styles
+import { useRouter } from 'next/router';
+import '../styles/globals.css';
+import React from 'react';
+import Link from 'next/link';
+import WalletProvider from '../context/WalletContext';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
+// Styling the navigation bar
+const Navbar = () => (
+  <nav className="p-4 bg-gray-900">
+    <div className="container mx-auto">
+      <Link href="/">
+        <div className="text-3xl font-bold text-white cursor-pointer">ArtNFT Marketplace</div>
+      </Link>
+      <div className="flex items-center space-x-4">
+        <Link href="/">
+          <div className="text-gray-300 cursor-pointer hover:text-white">Home</div>
+        </Link>
+        <Link href="/create-nft">
+          <div className="text-gray-300 cursor-pointer hover:text-white">Create NFT</div>
+        </Link>
+        <Link href="/my-nfts">
+          <div className="text-gray-300 cursor-pointer hover:text-white">My NFTs</div>
+        </Link>
+      </div>
+    </div>
+  </nav>
+);
 
+// Main application component
 function MyApp({ Component, pageProps }) {
+  const router = useRouter();
+
+  // Check if the current route is the home page
+  const isHomePage = router.pathname === '/';
 
   return (
-    <div>
+    <div className="min-h-screen bg-gray-100">
       <WalletProvider>
-        <nav className="p-6 bg-gray-100 border-b">
-          <p className="text-4xl font-bold text-yellow-9000">NFT Marketplace</p>
-          <div className="flex mt-4">
-            <Link href="/" className="mr-4 text-gray-900 border-b">
-              Home
-            </Link>
-            <Link href="/create-nft" className="mr-6 text-gray-900 border-b">
-              Create NFT
-            </Link>
-            <Link href="/my-nfts" className="mr-6 text-gray-900 border-b">
-              My NFTs
-            </Link>
-            {/* <button
-              className="block px-4 py-2 font-semibold text-white bg-gray-900 rounded-lg hover:bg-gray-700"
-              onClick={walletToggle}
-              // disabled={walletState}
-            >
-             {walletState? "Wallet Connected" : "Connect Wallet" }
-            </button> */}
-          </div>
-        </nav>
-        <Component {...pageProps} />
+        <Navbar />
+        <div className="container pt-8 pb-16 mx-auto">
+          {/* Original Component */}
+          <Component {...pageProps} />
+        </div>
         <ToastContainer position="bottom-right" theme="dark" />
       </WalletProvider>
     </div>

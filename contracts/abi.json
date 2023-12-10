@@ -168,6 +168,37 @@
             {
                "indexed": true,
                "internalType": "address",
+               "name": "owner",
+               "type": "address"
+            },
+            {
+               "indexed": true,
+               "internalType": "uint256",
+               "name": "id",
+               "type": "uint256"
+            },
+            {
+               "indexed": false,
+               "internalType": "string",
+               "name": "name",
+               "type": "string"
+            },
+            {
+               "indexed": false,
+               "internalType": "string",
+               "name": "tokenURI",
+               "type": "string"
+            }
+         ],
+         "name": "RewardNFTMinted",
+         "type": "event"
+      },
+      {
+         "anonymous": false,
+         "inputs": [
+            {
+               "indexed": true,
+               "internalType": "address",
                "name": "buyer",
                "type": "address"
             },
@@ -269,6 +300,19 @@
          "type": "function"
       },
       {
+         "inputs": [],
+         "name": "checkRewardEligibility",
+         "outputs": [
+            {
+               "internalType": "bool",
+               "name": "",
+               "type": "bool"
+            }
+         ],
+         "stateMutability": "view",
+         "type": "function"
+      },
+      {
          "inputs": [
             {
                "internalType": "uint256",
@@ -301,25 +345,6 @@
             }
          ],
          "name": "isApprovedForAll",
-         "outputs": [
-            {
-               "internalType": "bool",
-               "name": "",
-               "type": "bool"
-            }
-         ],
-         "stateMutability": "view",
-         "type": "function"
-      },
-      {
-         "inputs": [
-            {
-               "internalType": "address",
-               "name": "forwarder",
-               "type": "address"
-            }
-         ],
-         "name": "isTrustedForwarder",
          "outputs": [
             {
                "internalType": "bool",
@@ -369,6 +394,13 @@
                "type": "uint256"
             }
          ],
+         "stateMutability": "nonpayable",
+         "type": "function"
+      },
+      {
+         "inputs": [],
+         "name": "mintRewardNFT",
+         "outputs": [],
          "stateMutability": "nonpayable",
          "type": "function"
       },
@@ -488,6 +520,32 @@
          "type": "function"
       },
       {
+         "inputs": [],
+         "name": "rewardThreshold",
+         "outputs": [
+            {
+               "internalType": "uint256",
+               "name": "",
+               "type": "uint256"
+            }
+         ],
+         "stateMutability": "view",
+         "type": "function"
+      },
+      {
+         "inputs": [],
+         "name": "rewardURI",
+         "outputs": [
+            {
+               "internalType": "string",
+               "name": "",
+               "type": "string"
+            }
+         ],
+         "stateMutability": "view",
+         "type": "function"
+      },
+      {
          "inputs": [
             {
                "internalType": "address",
@@ -591,6 +649,25 @@
       {
          "inputs": [
             {
+               "internalType": "address",
+               "name": "",
+               "type": "address"
+            }
+         ],
+         "name": "thresholdTracker",
+         "outputs": [
+            {
+               "internalType": "uint256",
+               "name": "",
+               "type": "uint256"
+            }
+         ],
+         "stateMutability": "view",
+         "type": "function"
+      },
+      {
+         "inputs": [
+            {
                "internalType": "uint256",
                "name": "tokenId",
                "type": "uint256"
@@ -644,6 +721,32 @@
          "type": "function"
       },
       {
+         "inputs": [
+            {
+               "internalType": "uint256",
+               "name": "_rewardThreshold",
+               "type": "uint256"
+            }
+         ],
+         "name": "updateRewardThreshold",
+         "outputs": [],
+         "stateMutability": "nonpayable",
+         "type": "function"
+      },
+      {
+         "inputs": [
+            {
+               "internalType": "string",
+               "name": "_rewardURI",
+               "type": "string"
+            }
+         ],
+         "name": "updateRewardURI",
+         "outputs": [],
+         "stateMutability": "nonpayable",
+         "type": "function"
+      },
+      {
          "inputs": [],
          "name": "viewAll",
          "outputs": [
@@ -675,7 +778,7 @@
                      "type": "bool"
                   }
                ],
-               "internalType": "struct NFTMarketplace.NFT[]",
+               "internalType": "struct ARTMarketplace.NFT[]",
                "name": "",
                "type": "tuple[]"
             }
@@ -721,7 +824,7 @@
                      "type": "bool"
                   }
                ],
-               "internalType": "struct NFTMarketplace.NFT[]",
+               "internalType": "struct ARTMarketplace.NFT[]",
                "name": "",
                "type": "tuple[]"
             }

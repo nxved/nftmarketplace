@@ -22,12 +22,16 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [globalLoading, setGlobalLoading] = useState(false);
   const [loadingNftId, setLoadingNftId] = useState(null);
-
+  const [thresholdRE, setThresholdRE] = useState(null);
 
   const [loadingState, setLoadingState] = useState("not-loaded");
   useEffect(() => {
     loadNFTs();
   }, []);
+
+  useEffect(() => {
+    loadNFTs();
+  }, [walletState, NFTcontract]);
 
   async function loadNFTs() {
     setGlobalLoading(true);
@@ -37,6 +41,9 @@ export default function Home() {
       NFTMarketplace.abi,
       provider
     );
+    const thresholdAmnt = await contract.rewardThreshold();
+    let threshold = ethers.utils.formatUnits(thresholdAmnt.toString(), "ether");
+    setThresholdRE(threshold)
     const data = await contract.viewAll();
     const items = await Promise.all(
       data.map(async (i) => {
@@ -68,90 +75,49 @@ export default function Home() {
   }
 
   async function buyNft(nft) {
-    // if (typeof window.ethereum !== 'undefined') {
-    //   console.log("1")
-    //   const biconomy = new Biconomy(
-    //     window.ethereum,
-    //     {
-    //       apiKey: "UBh3_aHZV.1c752e3a-7c2b-439c-939d-95bbc4ec3e06",
-    //       debug: true,
-    //       contractAddresses: "0xafEC87E63C497b568f1d3B6A1aE087f22005974D",
-    //     }
-    //   );
-    //   console.log(biconomy)
-    //   console.log("2")
-
-    //   const provider = await biconomy.provider;
-
-    //   const contractInstance = new ethers.Contract(
-    //     NFTMarketplace.address,
-    //     NFTMarketplace.abi,
-    //     biconomy.ethersProvider
-    //   );
-    //   console.log(contractInstance)
-    //   await biconomy.init();
-    //   console.log("3")
-
-    //   const price = ethers.utils.parseUnits(nft.price.toString(), "ether");
-    //   const { data } = await contractInstance.populateTransaction.buy(nft.tokenId);
-    //   console.log(data)
-
-    //   let txParams = {
-    //     data: data,
-    //     to: NFTMarketplace.address,
-    //     from: walletState,
-    //     value: price,
-    //     signatureType: "EIP712_SIGN",
-    //   };
-    //   console.log("4")
-
-    //   await provider.send("eth_sendTransaction", [txParams]);
-    //   console.log("5")
-
-    // }
+    if (!walletState) {
+      toast.error("Connect Wallet First!!");
+      return;
+    }
 
     setLoading(true);
     setLoadingNftId(nft.tokenId);
     const price = ethers.utils.parseUnits(nft.price.toString(), "ether");
-try{
-    const transaction = await NFTcontract.buy(nft.tokenId, {
-      value: price,
-    });
-    await transaction
-      .wait()
-      .then(async (tx) => {
-        console.log(tx);
-        if (tx.status === 1) {
-          console.log("Transaction successful:", tx);
-          toast.success("Successfully Bought NFT");
-          loadNFTs();
-          setLoadingNftId(null);
-
-          setLoading(false);
-
-        } else {
-          console.error("Transaction failed:", tx);
-          toast.error("Transaction failed. Please try again.");
-          setLoading(false);
-          setLoadingNftId(null);
-
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        toast.error("Error in Buying");
-        setLoading(false);
-        setLoadingNftId(null);
-
+    try {
+      const transaction = await NFTcontract.buy(nft.tokenId, {
+        value: price,
       });
+      await transaction
+        .wait()
+        .then(async (tx) => {
+          console.log(tx);
+          if (tx.status === 1) {
+            console.log("Transaction successful:", tx);
+            toast.success("Successfully Bought NFT");
+            loadNFTs();
+            setLoadingNftId(null);
+
+            setLoading(false);
+          } else {
+            console.error("Transaction failed:", tx);
+            toast.error("Transaction failed. Please try again.");
+            setLoading(false);
+            setLoadingNftId(null);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+          toast.error("Error in Buying");
+          setLoading(false);
+          setLoadingNftId(null);
+        });
     } catch (error) {
       toast.error("User Rejected Transaction");
       setLoading(false);
       setLoadingNftId(null);
-   }
+    }
     setLoading(false);
     setLoadingNftId(null);
-
   }
 
   if (loadingState === "loaded" && !nfts.length)
@@ -162,48 +128,87 @@ try{
     );
   return (
     <div className="dark:bg-gray-dark dark:text-white">
-      {!walletState ? (
-        <button
-          onClick={walletToggle}
-          className="block px-8 py-4 mx-auto mt-40 font-semibold text-white bg-gray-900 rounded-lg hover:bg-gray-700"
-        >
-          Connect your wallet
-        </button>
-      ) : (
-        <div className="px-4" style={{ maxWidth: "1600px" }}>
-          {globalLoading && <Loading />}
-          <div className="grid grid-cols-1 gap-4 pt-4 sm:grid-cols-2 lg:grid-cols-4">
-            {nfts.map((nft, i) => (
-              <div key={i} className="overflow-hidden border shadow rounded-xl">
-                <img src={nft.image} />
-                <div className="p-4">
-                  <p
-                    style={{ height: "64px" }}
-                    className="text-2xl font-semibold"
-                  >
-                    {nft.name}
-                  </p>
-                  <div style={{ height: "70px", overflow: "hidden" }}>
-                    <p className="text-gray-400">{nft.description}</p>
-                  </div>
-                </div>
-                <div className="p-4 bg-black">
-                  <p className="text-2xl font-bold text-white">
-                    {nft.price} ETH
-                  </p>
-                  <button
-                    className="w-full px-12 py-2 mt-4 font-bold text-white bg-gray-500 rounded"
-                    onClick={() => buyNft(nft)}
-                    disabled={loading}
-                  > {loadingNftId === nft.tokenId ? "Buying" : "BUY"}
-                  </button>
+  <div className="flex items-start justify-between mb-4">
+  <div className="mx-auto sm:mx-0">
+    </div>
+        <div>
+          {!walletState ? (
+            <button
+              onClick={walletToggle}
+              className="block px-8 py-4 mt-4 font-semibold text-white bg-gray-900 rounded-lg hover:bg-gray-700"
+            >
+              Connect your wallet
+            </button>
+          ) : (
+            <p className="font-bold text-blue-900">
+              Connected to: {walletState.slice(0, 15)}....
+            </p>
+          )}
+        </div>
+      </div>
+      <div className="p-8 mb-8 bg-white rounded-lg shadow-md">
+        <h2 className="mb-1 text-2xl font-thin mx-25">
+          Marketplace Especially Designed for Artists
+        </h2>
+        <div className="grid grid-cols-2 gap-2">
+          <img
+            src="/image1.png"
+            alt="Artwork 1"
+            className="object-cover w-full h-48 rounded-md"
+          />
+          <img
+            src="/image2.png"
+            alt="Artwork 2"
+            className="object-cover w-full h-48 rounded-md"
+          />
+        </div>
+      </div>
+      <div className="p-1 mb-1 text-center bg-white rounded-lg shadow-md">
+      <h2 className="mb-2 text-2xl font-thin">
+        Currently Listed NFT
+        </h2>
+        </div>
+
+      <div className="px-4" style={{ maxWidth: "1600px" }}>
+        {globalLoading && <Loading />}
+        <div className="grid grid-cols-1 gap-4 pt-4 sm:grid-cols-2 lg:grid-cols-4">
+          {nfts.map((nft, i) => (
+            <div key={i} className="overflow-hidden border shadow rounded-xl">
+              <img
+                src={nft.image}
+                className="object-cover w-full h-64"
+                alt={`NFT ${i}`}
+              />
+              <div className="p-4">
+                <p
+                  style={{ height: "40px" }}
+                  className="text-2xl font-semibold"
+                >
+                  {nft.name}
+                </p>
+                <div style={{ height: "70px", overflow: "hidden" }}>
+                  <p className="text-gray-400">{nft.description}</p>
                 </div>
               </div>
-            ))}
-          </div>
+              <div className="p-4 bg-black">
+                <p className="text-xl font-thin text-white">{nft.price} ETH</p>
+                <button
+                  className="w-full px-12 py-2 mt-4 font-thin text-white bg-gray-500 rounded"
+                  onClick={() => buyNft(nft)}
+                  disabled={loading}
+                >
+                  {loadingNftId === nft.tokenId ? "Buying" : "BUY"}
+                </button>
+              </div>
+            </div>
+          ))}
         </div>
-      )}
+      </div>
+      <div className="p-4 mt-4 mb-4 text-center bg-white rounded-lg shadow-md">
+      <h2 className="mb-2 text-xl font-thin">
+        `Become Part of Loyalty Program : Purchase NFT of amount ${thresholdRE} Eth and get Rewarded with NFT`
+        </h2>
+        </div>
     </div>
   );
 }
-  

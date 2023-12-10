@@ -39,12 +39,18 @@ export default function WalletProvider({ children }) {
       console.log(walletAddress)
     }
   }, [walletAddress, walletConnected]);
+  
 
   useEffect(() => {
     console.log(walletAddress)
     toggleWalletButton();
       checkChainId();
   }, []);
+
+  useEffect(() => {
+    checkChainId();
+  }, [walletAddress]);
+  
 
   useEffect(() => {
     setContract();
@@ -69,13 +75,13 @@ export default function WalletProvider({ children }) {
     const connection = await web3Modal.connect();
     const walletProvider = new ethers.providers.Web3Provider(connection);
     const network = await walletProvider.getNetwork();
-    if (network.chainId !== 80001) {
-       toast.error("Change the network to Mumbai")
+    if (network.chainId !== chainConfig.chain) {
+       toast.error(`Change the network to ${chainConfig.chainName}`)
      // window.alert("Change the network to Mumbai")
       try {
         await ethereum.request({
           method: 'wallet_switchEthereumChain',
-          params: [{ chainId: '0x13881' }],
+          params: [{ chainId: chainConfig.chainId }],
         });
       } catch (switchError) {
         // This error code indicates that the chain has not been added to MetaMask.
@@ -85,8 +91,8 @@ export default function WalletProvider({ children }) {
               method: 'wallet_addEthereumChain',
               params: [
                 {
-                  chainId: '0x13881',
-                  chainName: 'PolygonMumbai',
+                  chainId: chainConfig.chainId,
+                  chainName: chainConfig.chainName,
                   rpcUrls: chainConfig.rpcUrls,
                 },
               ],

@@ -1,9 +1,7 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { ethers } from "ethers";
-import { create as ipfsHttpClient } from "ipfs-http-client";
+import axios from "axios";
 import { useRouter } from "next/router";
-
-const client = ipfsHttpClient("https://ipfs.infura.io:5001/api/v0");
 import { NFTMarketplace, chainConfig } from "../config.js";
 import {
   useWalletUpdate,
@@ -12,42 +10,91 @@ import {
 } from "../context/WalletContext.js";
 import { toast } from "react-toastify";
 
+import Head from "next/head";
+import Image from "next/image";
+
 export default function CreateItem() {
-  const [fileUrl, setFileUrl] = useState(null);
-  const [formInput, updateFormInput] = useState({ nameNFT: "", tokenURI: "" });
+  const [file, setFile] = useState("");
+  const [cid, setCid] = useState("");
+  const [uploading, setUploading] = useState(false);
+
+  const inputFile = useRef(null);
+
+  const uploadFile = async (fileToUpload) => {
+    try {
+      setUploading(true);
+
+      const res = await fetch("/api/files", {
+        method: "POST",
+        body: JSON.stringify(fileToUpload),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      const responseData = await res.json(); // Parse JSON response
+      const ipfsHash = responseData.data
+      setCid(ipfsHash);
+      setUploading(false);
+      console.log(ipfsHash)
+    } catch (e) {
+      console.log(e);
+      setUploading(false);
+      toast.error("Error in minting try again")
+    }
+  };
+
+  const [formInput, updateFormInput] = useState({
+    nameNFT: "",
+    description: "",
+    imageLink: "",
+  });
   const router = useRouter();
   const walletToggle = useWalletUpdate();
   const walletState = useWallet();
   const NFTcontract = useNFTMarketContract();
   const [loading, setLoading] = useState(false);
 
+
+
   async function mint() {
-    const { nameNFT, tokenURI } = formInput;
-    if (!nameNFT || !tokenURI) {
+    const { nameNFT, description, imageLink } = formInput;
+    if (!nameNFT || !description || !imageLink) {
       toast.error("Fill all the Details");
       return;
     }
     setLoading(true);
-    let transaction = await NFTcontract.mint(nameNFT, tokenURI);
-    await transaction
-      .wait()
-      .then(async (tx) => {
+
+    try {
+      // Upload image to Pinata
+      const metadata = {
+        description: description,
+        image: imageLink,
+        name: nameNFT,
+      };
+
+     await uploadFile(metadata);
+
+      const transaction = await NFTcontract.mint(
+        nameNFT,
+        `https://gateway.pinata.cloud/ipfs/${cid}`
+      );
+      await transaction.wait().then(async (tx) => {
         console.log(tx);
         if (tx.status === 1) {
           console.log("Transaction successful:", tx);
           toast.success("Successfully Created NFT");
+          router.push("/");
         } else {
           console.error("Transaction failed:", tx);
           toast.error("Transaction failed. Please try again.");
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        toast.error("Error in Creating");
+        };
       });
-    setLoading(false);
-
-    router.push("/");
+    } catch (error) {
+      console.error("Error creating NFT:", error);
+      toast.error("Error in Creating NFT. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -69,10 +116,17 @@ export default function CreateItem() {
             }
           />
           <textarea
-            placeholder="Token URI"
+            placeholder="Description"
             className="p-4 mt-2 border rounded"
             onChange={(e) =>
-              updateFormInput({ ...formInput, tokenURI: e.target.value })
+              updateFormInput({ ...formInput, description: e.target.value })
+            }
+          />
+          <input
+            placeholder="Image Link"
+            className="p-4 mt-2 border rounded"
+            onChange={(e) =>
+              updateFormInput({ ...formInput, imageLink: e.target.value })
             }
           />
           <button

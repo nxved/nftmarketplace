@@ -28,6 +28,7 @@ export default function ResellNFT() {
   async function fetchNFT() {
     if (!tokenURI) return;
     const meta = await axios.get(tokenURI);
+    console.log(meta)
     updateFormInput((state) => ({ ...state, image: meta.data.image }));
   }
 
