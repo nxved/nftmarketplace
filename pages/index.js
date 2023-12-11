@@ -43,7 +43,7 @@ export default function Home() {
     );
     const thresholdAmnt = await contract.rewardThreshold();
     let threshold = ethers.utils.formatUnits(thresholdAmnt.toString(), "ether");
-    setThresholdRE(threshold)
+    setThresholdRE(threshold);
     const data = await contract.viewAll();
     const items = await Promise.all(
       data.map(async (i) => {
@@ -121,9 +121,8 @@ export default function Home() {
   }
   return (
     <div className="dark:bg-gray-dark dark:text-white">
-  <div className="flex items-start justify-between mb-4">
-  <div className="mx-auto sm:mx-0">
-    </div>
+      <div className="flex items-start justify-between mb-4">
+        <div className="mx-auto sm:mx-0"></div>
         <div>
           {!walletState ? (
             <button
@@ -157,57 +156,58 @@ export default function Home() {
         </div>
       </div>
       <div className="p-1 mb-1 text-center bg-white rounded-lg shadow-md">
-      <h2 className="mb-2 text-2xl font-thin">
-        Currently Listed NFT
-        </h2>
-        </div>
-{  (loadingState === "loaded" && !nfts.length) ?
-      <h1 className="w-full px-12 py-2 mt-4 font-bold text-white bg-gray-900 rounded">
-      No items in marketplace
-    </h1>
-:
-      <div className="px-4" style={{ maxWidth: "1600px" }}>
-        {globalLoading && <Loading />}
-        <div className="grid grid-cols-1 gap-4 pt-4 sm:grid-cols-2 lg:grid-cols-4">
-          {nfts.map((nft, i) => (
-            <div key={i} className="overflow-hidden border shadow rounded-xl">
-              <img
-                src={nft.image}
-                className="object-cover w-full h-64"
-                alt={`NFT ${i}`}
-              />
-              <div className="p-4">
-                <p
-                  style={{ height: "40px" }}
-                  className="text-2xl font-semibold"
-                >
-                  {nft.name}
-                </p>
-                <div style={{ height: "70px", overflow: "hidden" }}>
-                  <p className="text-gray-400">{nft.description}</p>
+        <h2 className="mb-2 text-2xl font-thin">Currently Listed NFT</h2>
+      </div>
+      {loadingState === "loaded" && !nfts.length ? (
+        <h1 className="w-full px-12 py-2 mt-4 font-bold text-white bg-gray-900 rounded">
+          No items in marketplace
+        </h1>
+      ) : (
+        <div className="px-4" style={{ maxWidth: "1600px" }}>
+          {globalLoading && <Loading />}
+          <div className="grid grid-cols-1 gap-4 pt-4 sm:grid-cols-2 lg:grid-cols-4">
+            {nfts.map((nft, i) => (
+              <div key={i} className="overflow-hidden border shadow rounded-xl">
+                <img
+                  src={nft.image}
+                  className="object-cover w-full h-64"
+                  alt={`NFT ${i}`}
+                />
+                <div className="p-4">
+                  <p
+                    style={{ height: "40px" }}
+                    className="text-2xl font-semibold"
+                  >
+                    {nft.name}
+                  </p>
+                  <div style={{ height: "70px", overflow: "hidden" }}>
+                    <p className="text-gray-400">{nft.description}</p>
+                  </div>
+                </div>
+                <div className="p-4 bg-black">
+                  <p className="text-xl font-thin text-white">
+                    {nft.price} ETH
+                  </p>
+                  <button
+                    className="w-full px-12 py-2 mt-4 font-thin text-white bg-gray-500 rounded"
+                    onClick={() => buyNft(nft)}
+                    disabled={loading}
+                  >
+                    {loadingNftId === nft.tokenId ? "Buying" : "BUY"}
+                  </button>
                 </div>
               </div>
-              <div className="p-4 bg-black">
-                <p className="text-xl font-thin text-white">{nft.price} ETH</p>
-                <button
-                  className="w-full px-12 py-2 mt-4 font-thin text-white bg-gray-500 rounded"
-                  onClick={() => buyNft(nft)}
-                  disabled={loading}
-                >
-                  {loadingNftId === nft.tokenId ? "Buying" : "BUY"}
-                </button>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
-}
+      )}
 
       <div className="p-4 mt-4 mb-4 text-center bg-white rounded-lg shadow-md">
-      <h2 className="mb-2 text-xl font-thin">
-        `Become Part of Loyalty Program : Purchase NFT of amount ${thresholdRE} Eth and get Rewarded with NFT`
+        <h2 className="mb-2 text-xl font-thin">
+          `Become Part of Loyalty Program : Purchase NFT of amount $
+          {thresholdRE} Eth and get Rewarded with NFT`
         </h2>
-        </div>
+      </div>
     </div>
   );
 }

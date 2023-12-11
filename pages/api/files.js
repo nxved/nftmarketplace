@@ -15,15 +15,12 @@ export default async function handler(req, res) {
     try {
       console.log("****************************")
       console.log(req.body)
-        // Assuming the JSON object is attached to the "file" field
 
-        // Call pinJSONToIPFS to pin the JSON object to Pinata
        const pinataResponse = await pinJSONToIPFS(req.body);
        console.log(pinataResponse.data.IpfsHash)
 
         res.status(200).json({ success: true, message: "NFT creation successful", data : pinataResponse.data.IpfsHash });
 
-        // ... rest of the code
     } catch (e) {
       console.log(e);
       res.status(500).json({ success: false, message: "Server Error" });
@@ -34,10 +31,8 @@ export default async function handler(req, res) {
 }
 
 export const pinJSONToIPFS = async (metadata) => {
-  // Your existing pinJSONToIPFS logic here
   const data = JSON.stringify({
     pinataContent: {
-      // Use metadata properties here
       name: metadata.name,
       description: metadata.description,
       image: metadata.image,

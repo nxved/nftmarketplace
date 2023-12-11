@@ -147,7 +147,6 @@ export default function MyAssets() {
       ) : (
         <div className="p-4">
           {globalLoading && <Loading />}
-          {/* Section for checking eligibility and minting reward NFT */}
           <div className="p-6 mb-8 bg-blue-200 rounded-lg">
             {isEligibleForReward ? (
               <div className="flex items-center">
@@ -188,7 +187,6 @@ export default function MyAssets() {
                     Threshold Amount for Reward : ${thresholdAmnt}
                   </p>
                 </div>
-                {/* You can add additional text or elements here if needed */}
               </div>
             )}
           </div>
@@ -199,7 +197,7 @@ export default function MyAssets() {
                 {console.log(nfts)}
                 <img
                   src={nft.image}
-                  className="object-cover w-full h-48 rounded" // Set a fixed height, adjust as needed
+                  className="object-cover w-full h-48 rounded"
                   alt={`NFT ${i}`}
                 />
                 <div className="p-4 bg-black">

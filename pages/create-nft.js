@@ -64,7 +64,6 @@ export default function CreateItem() {
     setLoading(true);
 
     try {
-      // Upload image to Pinata
       const metadata = {
         description: description,
         image: imageLink,
