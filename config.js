@@ -64,7 +64,7 @@ const ChainConfig = {
       },
       NFTMarketplace: {
         address: ethers.utils.getAddress(
-          "0xfc4bB16fBCE3173F566Bab96E2b3769BBE6C27Be"
+          "0xF7495bc2aF32dec71e70b4Ae112AAbBB7e8e821c"
         ),
         abi: NFTMarketplaceABI,
       },

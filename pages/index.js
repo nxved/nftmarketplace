@@ -9,6 +9,7 @@ import {
   useWalletUpdate,
   useWallet,
   useNFTMarketContract,
+  useMintContract
 } from "../context/WalletContext.js";
 import { Biconomy } from "@biconomy/mexa";
 import { toast } from "react-toastify";
@@ -17,6 +18,7 @@ export default function Home() {
   const walletToggle = useWalletUpdate();
   const walletState = useWallet();
   const NFTcontract = useNFTMarketContract();
+  const MINTContract = useMintContract();
 
   const [nfts, setNfts] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -119,6 +121,38 @@ export default function Home() {
     setLoading(false);
     setLoadingNftId(null);
   }
+  async function handleMInt() {
+    if (!walletState) {
+      toast.error("Connect Wallet First!!");
+      return;
+    }
+
+      const result = await MINTContract.estimateGas.buyChest("1", "0", false);
+      console.log("====================================================" , Number(result))
+
+      const tx = await MINTContract.buyChest("1", "0", false, { gasLimit : Number(result)*2});
+      await tx
+        .wait()
+        .then(async (tx) => {
+          console.log(tx);
+          if (tx.status === 1) {
+            console.log("Transaction successful:", tx);
+            toast.success("Successfully Bought NFT");
+            setLoading(false);
+          } else {
+            console.error("Transaction failed:", tx);
+            toast.error("Transaction failed. Please try again.");
+            setLoading(false);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+          toast.error("Error in Buying");
+          setLoading(false);
+        });
+
+    setLoading(false);
+  }
   return (
     <div className="dark:bg-gray-dark dark:text-white">
       <div className="flex items-start justify-between mb-4">
@@ -131,10 +165,17 @@ export default function Home() {
             >
               Connect your wallet
             </button>
-          ) : (
+          ) : (<>
             <p className="font-bold text-blue-900">
               Connected to: {walletState.slice(0, 15)}....
             </p>
+                        <button
+                        onClick={handleMInt}
+                        className="block px-8 py-4 mt-4 font-semibold text-white bg-gray-900 rounded-lg hover:bg-gray-700"
+                      >
+                        mint
+                      </button>
+                      </>
           )}
         </div>
       </div>

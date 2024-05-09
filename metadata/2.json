@@ -1,0 +1,17 @@
+{
+   "name": "Paras #F02",
+   "description": "https://mappasaurus.com/",
+   "external_url": "https://mappasaurus.com/",
+   "image": "https://ipfs.io/ipfs/QmTESasfEetmgM1fJnMsxkKaz6mUsdPVDbaDgnfK6ZCmjN/fossil/uncommon.png",
+   "marketplace": "getgems.io",
+   "attributes": [
+      {
+         "trait_type": "League",
+         "value": "Fossil"
+      },
+      {
+         "trait_type": "Rarity",
+         "value": "uncommon"
+      }
+   ]
+}
